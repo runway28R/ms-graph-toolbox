@@ -19,7 +19,7 @@ def get_users(gph_object,
       and escapes single quotes in filter values.
 
     Args:
-        gph_object: An initialized ms_graph object with valid access_token and logger.
+        gph_object: An initialized ms_graph_toolbox object with valid access_token and logger.
         select_data: Comma-separated string or a list of properties to return (e.g. "displayName,mail,jobTitle").
         search_name: Filter users by displayName (partial, startswith).
         search_title: Filter users by jobTitle (partial, startswith).

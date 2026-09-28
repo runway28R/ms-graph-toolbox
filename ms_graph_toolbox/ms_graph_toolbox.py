@@ -5,7 +5,7 @@ Basic code to obtain an application token via MSAL to be used with Microsoft Gra
 import msal
 
 
-class ms_graph:
+class ms_graph_toolbox:
     """
     Wrapper class to handle app-only authentication and sending email via Microsoft Graph.
 
