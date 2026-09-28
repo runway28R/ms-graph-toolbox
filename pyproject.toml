@@ -1,32 +1,34 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=77.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ms-graph-wrapper"
-version = "0.0.7"
-description = "A lightweight Python wrapper around Microsoft Graph API for sending email, working with users, and SharePoint operations."
+name = "ms-graph-toolbox"
+version = "0.1.0"
+description = "A lightweight Python wrapper around Microsoft Graph for email, users, and SharePoint operations."
 authors = [
-    { name="runway28R" }
+    { name = "runway28R" }
 ]
 readme = "README.md"
-license = { file = "LICENSE" }
-
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 
-# Add your dependencies here
 dependencies = [
     "requests>=2.31.0",
-    "msal>=1.25.0",
+    "msal>=1.27.0",
 ]
 
 [project.urls]
-Homepage = "https://github.com/runway28R/ms-graph"
-Source = "https://github.com/runway28R/ms-graph"
-Issues = "https://github.com/runway28R/ms-graph/issues"
-
-[tool.setuptools]
-package-dir = {"" = "ms_graph"}
+Homepage = "https://github.com/runway28R/ms-graph-toolbox"
+Source = "https://github.com/runway28R/ms-graph-toolbox"
+Issues = "https://github.com/runway28R/ms-graph-toolbox/issues"
 
 [tool.setuptools.packages.find]
-where = ["ms_graph"]
+where = ["."]
+include = ["ms_graph_toolbox*"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]

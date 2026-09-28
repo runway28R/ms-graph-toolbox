@@ -1,144 +1,165 @@
 # Microsoft Graph Toolbox
 
-A Python package that simplifies using Microsoft Graph API. 
-It provides an easy-to-use interface for authenticating with Microsoft Graph and using its capabilities.
-The code expects a logger object with .debug/.info/.warning/.error methods.
+A lightweight Python wrapper around Microsoft Graph for sending email, retrieving users, and working with SharePoint files.
 
-## Current Features
-- **Email Operations** (graph_email): Send emails with attachments, HTML content, and more
-- **User Queries** (graph_users): Search and retrieve user profiles with flexible filters and projection
-- **SharePoint Operations** (graph_sharepoint): Upload files, list folder contents
+## Features
 
-## General Prerequisites
+- Authenticate with Microsoft Graph using Microsoft Entra ID application credentials
+- Send email messages
+- Retrieve users from Microsoft Graph
+- List SharePoint sites and document libraries
+- Browse folders and upload files to SharePoint
 
-- Python 3.12 or higher (lower versions may work but are not tested)
-- Azure AD registered application with:
-  - Client ID
-  - Client Secret
-- Required Microsoft Graph API permissions depending on feature:
-  - Email operations: Mail.Send
-  - User queries: User.Read, User.Read.All
-  - SharePoint operations: Sites.Read.All, Sites.ReadWrite.All, Files.ReadWrite.All
+## Requirements
+
+- Python 3.12 or newer
+- A Microsoft Entra ID application registration
+- Microsoft Graph API permissions
+- A Microsoft 365 account with access to the required resources
 
 ## Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/runway28R/ms-graph.git
-cd ms-graph
+Install the package from PyPI:
 
-# Install required packages
-pip install -r requirements.txt
+```bash
+pip install ms-graph-toolbox
 ```
+
+## Authentication
+
+The package uses application credentials:
+
+- Client ID
+- Client secret
+- Tenant ID
+
+Make sure the application has the required Microsoft Graph permissions and that administrator consent has been granted where necessary.
+
+## Basic Usage
+
+```python
+import logging
+import os
+
+from ms_graph_toolbox.ms_graph_toolbox import ms_graph_toolbox
+
+logger = logging.getLogger(__name__)
+
+graph = ms_graph_toolbox(
+    client_id=os.environ["MS_GRAPH_CLIENT_ID"],
+    client_secret=os.environ["MS_GRAPH_CLIENT_SECRET"],
+    tenant_id=os.environ["MS_GRAPH_TENANT_ID"],
+    logger=logger,
+)
+```
+
+The object automatically obtains an access token that is used by the other package functions.
+
+## Sending Email
+
+```python
+from ms_graph_toolbox.graph_email import send_email
+
+send_email(
+    gph_object=graph,
+    subject="Test message",
+    content_type="Text",
+    body="This message was sent using Microsoft Graph.",
+    sender="sender@example.com",
+    to_field="recipient@example.com",
+)
+```
+
+Additional options include carbon-copy recipients, blind-carbon-copy recipients, message priority, and file attachments.
+
+Multiple recipients can be provided as a comma-separated string:
+
+```python
+send_email(
+    gph_object=graph,
+    subject="Team update",
+    content_type="Text",
+    body="This message was sent to multiple recipients.",
+    sender="sender@example.com",
+    to_field="first@example.com, second@example.com",
+)
+```
+
+## Retrieving Users
+
+```python
+from ms_graph_toolbox.graph_users import get_users
+
+users = get_users(graph)
+
+for user in users:
+    print(user)
+```
+
+You can also filter the results by name, title, email address, alias, company, or selected fields:
+
+```python
+users = get_users(
+    graph,
+    select_data=["displayName", "mail", "jobTitle"],
+    search_name="Alex",
+)
+```
+
+## SharePoint Operations
+
+SharePoint functionality is available through the `graph_sharepoint` class:
+
+```python
+from ms_graph_toolbox.graph_sharepoint import graph_sharepoint
+
+sharepoint = graph_sharepoint(
+    access_token=graph.access_token,
+    logger=logger,
+)
+```
+
+The SharePoint tools support:
+
+- Finding a SharePoint site
+- Listing document libraries
+- Browsing folder contents
+- Uploading files
+
+See the [examples](https://github.com/runway28R/ms-graph-toolbox/tree/main/examples) directory for complete SharePoint usage examples.
+
+## Examples
+
+The repository contains complete examples for:
+
+- Sending email
+- Retrieving users
+- Uploading files to SharePoint
+
+The examples are available in the [examples](https://github.com/runway28R/ms-graph-toolbox/tree/main/examples) directory.
+
+## Configuration
+
+For local development, set these environment variables before running the examples.
+
+### PowerShell
+
+```powershell
+$env:MS_GRAPH_CLIENT_ID = "your-client-id"
+$env:MS_GRAPH_CLIENT_SECRET = "your-client-secret"
+$env:MS_GRAPH_TENANT_ID = "your-tenant-id"
+```
+
+### Bash
+
+```bash
+export MS_GRAPH_CLIENT_ID="your-client-id"
+export MS_GRAPH_CLIENT_SECRET="your-client-secret"
+export MS_GRAPH_TENANT_ID="your-tenant-id"
+```
+
+Do not commit client secrets or other credentials to the repository.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-
-### Function graph_email
-
-#### Prerequisites
-  - Required Microsoft Graph API permissions (Mail.Send)
-
-#### Features
-
-- App-only authentication using client credentials flow
-- Send emails with HTML or plain text content
-- Support for attachments (both regular and inline)
-- CC and BCC recipient support
-- Email priority settings
-- Logging capabilities
-
-#### Example Usage
-
-```bash
-# Send HTML email
-python -m examples.sending_email \
-    --client-id CLIENT_ID \
-    --client-secret CLIENT_SECRET \
-    --tenant-id TENANT_ID \
-    --sender from@someone.com \
-    --to friend@another.com \
-    --content-type HTML \
-    --body "<h1>Hello!</h1><p>This is a test email.</p>"
-```
-
-#### Features in Detail
-
-- **Content Types**: Support for both HTML and plain text
-- **Attachments**: Send files and inline images
-- **Recipients**: TO, CC, and BCC fields supported
-- **Priority**: Set email importance (low, normal, high)
-- **Logging**: Built-in logging for debugging and monitoring
-
-
-### Function graph_users
-
-#### Prerequisites
-  - Required Microsoft Graph API permissions (User.Read, User.Read.All)
-
-#### Features
-
-- Search and retrieve user profiles with flexible filters and projection
-- Get user details including email, name, and profile information
-- Support for pagination
-- Filtering by attributes (e.g., email, name, department)
-- Projection of specific fields (e.g., email, name)
-
-#### Example Usage
-
-```bash
-# Search for users
-python -m examples.searching_users \
-    --client-id CLIENT_ID \
-    --client-secret CLIENT_SECRET \
-    --tenant-id TENANT_ID \
-    --search_name "John Doe" \
-    --select_data givenName,displayName
-```
-
-#### Features in Detail
-
-- **Filters**: Search by name, email, company, etc.
-- **Fields**: Retrieve specific fields (e.g., displayName,givenName,surname,country,department,jobTitle,companyName,mail,accountEnabled)
-- **Pagination**: Support for retrieving large datasets
-- **Projection**: Select specific fields to return
-
-### Function graph_sharepoint
-
-#### Prerequisites
-  - Required Microsoft Graph API permissions: Sites.Read.All, Sites.ReadWrite.All, Files.ReadWrite.All
-
-#### Features
-
-- Upload local files to SharePoint document libraries
-- List contents of folders (separating files and subfolders)
-- Support for specifying folder paths within document libraries
-- Logging of folder content and upload results
-- App-only authentication using client credentials flow
-- Handles errors like missing files, invalid site URLs, or non-existing libraries
-- Optional display of folder content before uploading
-
-#### Example Usage
-
-```bash
-# Upload a file to SharePoint
-python -m examples.upload_file \
-    --client-id CLIENT_ID \
-    --client-secret CLIENT_SECRET \
-    --tenant-id TENANT_ID \
-    --site_url "contoso.sharepoint.com:/sites/TeamSite" \
-    --local_file_path "./report.xlsx" \
-    --document_library "Documents" \
-    --folder_path "Reports/2025"
-```
-
-
-#### Features in Detail
-
-- **Folders vs Files**: Automatically lists top-level folders and files in the target library
-- **Upload**: Uploads single files to specified folder, returns the SharePoint URL
-- **Folder path**: Optional; if not provided, uploads to root of library
-- **Error handling**: Returns clear messages if the file is missing or library/folder doesn’t exist
-- **Logging**: Logs debug info for folder content and upload results
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

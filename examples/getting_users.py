@@ -1,5 +1,5 @@
-from ms_src.ms_graph import ms_graph
-from ms_src.graph_users import get_users
+from ms_graph_toolbox.ms_graph_toolbox import ms_graph_toolbox
+from ms_graph_toolbox.graph_users import get_users
 from examples.logger import create_logger
 import argparse
 
@@ -26,7 +26,7 @@ def test_users():
     logger = create_logger()
 
     # Create Graph client object
-    gph_object = ms_graph(
+    gph_object = ms_graph_toolbox(
         client_id = args.client_id,
         client_secret = args.client_secret,
         tenant_id = args.tenant_id,
